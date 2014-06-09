@@ -1,14 +1,11 @@
 package application;
 
+import application.view.GUI;
+
 public class Main {
 
-	public Main() {
-		// TODO Auto-generated constructor stub
-	}
-
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+		new GUI("CHANGE ME IN MAIN");
 	}
 
 }
