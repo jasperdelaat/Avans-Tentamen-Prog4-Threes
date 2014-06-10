@@ -2,7 +2,7 @@ package threes.model;
 
 import java.util.Random;
 
-public abstract class Tile {
+public class Tile {
 
 	private int x_coordination, 
 				y_coordination, 

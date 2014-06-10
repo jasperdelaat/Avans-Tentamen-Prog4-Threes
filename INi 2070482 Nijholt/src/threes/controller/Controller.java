@@ -14,7 +14,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.sound.sampled.AudioInputStream;
@@ -27,20 +26,19 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.event.MouseInputListener;
 
+import threes.model.Board;
 import threes.model.Tile;
 import threes.view.GUI;
 
 public class Controller implements MouseInputListener, KeyListener {
 	
 	private GUI						frame;
-	private JPanel 					panel;
 	private HashMap<Integer, Color>	tileColor;
 	private HashMap<Integer, Color>	textColor;
 	private ActionAdapter 			aa = new ActionAdapter();
-	private ArrayList<Tile> 		tiles;
+	private Board					b;
 	private final int				maximum = 10, minimum = 2;
 	private JMenuItem				save,
 									load,
@@ -62,7 +60,8 @@ public class Controller implements MouseInputListener, KeyListener {
 		catch (IOException e) {
 			e.printStackTrace();
 		}*/
-		
+		frame.addMouseMotionListener(this);
+		frame.addMouseListener(this);
 		this.frame.setLoadingCursor(false);
 	}
 	
@@ -78,10 +77,10 @@ public class Controller implements MouseInputListener, KeyListener {
 	}
 	
 	private void restart() {
-		// TODO Auto-generated method stub
+		b = new Board(4);
 	}
 	private void restart(int size) {
-		// TODO Auto-generated method stub
+		b = new Board(size);
 	}
 	private void save() {
 		int result = myFileChooser.showSaveDialog(frame);
@@ -93,7 +92,7 @@ public class Controller implements MouseInputListener, KeyListener {
 					targetFile.createNewFile();
 				}
 				FileWriter fw = new FileWriter(targetFile);
-				for(Tile t: tiles){
+				for(Tile t: b.getTiles()){
 					fw.write(t.getX_coordination() + " " + t.getY_coordination() + " " + t.getValue());
 				}
 				fw.close();
@@ -108,7 +107,7 @@ public class Controller implements MouseInputListener, KeyListener {
 			try {
 				Path path = Paths.get(myFileChooser.getSelectedFile().toURI());
 				for (String s : Files.readAllLines(path,StandardCharsets.UTF_8)) {
-					tiles.add(new Tile(0,0,0));
+//					tiles.add(new Tile(0,0,0));
 //					content = content + s + "\n";
 				}
 				
@@ -141,23 +140,13 @@ public class Controller implements MouseInputListener, KeyListener {
 	}
 	
 	public void keyTyped(KeyEvent e) 		{}
-
-	public void mouseClicked(MouseEvent e) 	{
-		
-	}
-
+	public void mouseClicked(MouseEvent e) 	{}
 	public void mouseEntered(MouseEvent e) 	{}
 	public void mouseExited(MouseEvent e) 	{}
 	public void mousePressed(MouseEvent e) 	{}
 	public void mouseReleased(MouseEvent e) {}
 	public void mouseDragged(MouseEvent e) {}
 	public void mouseMoved(MouseEvent e) {}
-	
-	public void setPanel(JPanel panel) {
-		panel.addMouseMotionListener(this);
-		panel.addMouseListener(this);
-		this.panel = panel;
-	}
 	
 	// menu's maken en initializeren
 	private void createMenu(){
