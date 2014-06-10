@@ -6,8 +6,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -16,29 +22,38 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import javax.swing.JFrame;
+import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputListener;
 
 import threes.model.Tile;
+import threes.view.GUI;
 
 public class Controller implements MouseInputListener, KeyListener {
 	
-	private JFrame					frame;
+	private GUI						frame;
 	private JPanel 					panel;
 	private HashMap<Integer, Color>	tileColor;
 	private HashMap<Integer, Color>	textColor;
 	private ActionAdapter 			aa = new ActionAdapter();
 	private ArrayList<Tile> 		tiles;
+	private final int				maximum = 10, minimum = 2;
+	private JMenuItem				save,
+									load,
+									restart,	
+									change,
+									exit;
+	private JFileChooser 			myFileChooser = new JFileChooser();
 	
-	public Controller(JFrame f) {
+	public Controller(GUI f) {
 		this.frame = f;
-		
+		this.frame.setLoadingCursor(true);
 		this.createMenu();
-//		this.playSound("music.wav", true);
+		this.playSound("music.wav", true);
 		
 		// Load images
 		/*try {
@@ -47,6 +62,8 @@ public class Controller implements MouseInputListener, KeyListener {
 		catch (IOException e) {
 			e.printStackTrace();
 		}*/
+		
+		this.frame.setLoadingCursor(false);
 	}
 	
 	public void fillMaps(){
@@ -63,11 +80,42 @@ public class Controller implements MouseInputListener, KeyListener {
 	private void restart() {
 		// TODO Auto-generated method stub
 	}
-	private void save() {
+	private void restart(int size) {
 		// TODO Auto-generated method stub
 	}
+	private void save() {
+		int result = myFileChooser.showSaveDialog(frame);
+		if (result == JFileChooser.APPROVE_OPTION) {
+			File targetFile = myFileChooser.getSelectedFile();
+
+			try {
+				if (!targetFile.exists()) {
+					targetFile.createNewFile();
+				}
+				FileWriter fw = new FileWriter(targetFile);
+				for(Tile t: tiles){
+					fw.write(t.getX_coordination() + " " + t.getY_coordination() + " " + t.getValue());
+				}
+				fw.close();
+			} catch (IOException e) {
+				e.printStackTrace();	
+			}
+		}
+	}
 	private void load() {
-		// TODO Auto-generated method stub
+		int result = myFileChooser.showOpenDialog(frame);
+		if (result == JFileChooser.APPROVE_OPTION) {
+			try {
+				Path path = Paths.get(myFileChooser.getSelectedFile().toURI());
+				for (String s : Files.readAllLines(path,StandardCharsets.UTF_8)) {
+					tiles.add(new Tile(0,0,0));
+//					content = content + s + "\n";
+				}
+				
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
 	}
 
 	public void keyPressed(KeyEvent e) 		{
@@ -116,18 +164,21 @@ public class Controller implements MouseInputListener, KeyListener {
 		JMenuBar 	myMenuBar 	= new JMenuBar();
 		JMenu		optionMenu 	= new JMenu("Options");
 
-		JMenuItem	save 		= new JMenuItem("Save");
-		JMenuItem	load 		= new JMenuItem("Load");
-		JMenuItem	restart		= new JMenuItem("Restart");
-		JMenuItem	exit		= new JMenuItem("Exit");
+		save 		= new JMenuItem("Save");
+		load 		= new JMenuItem("Load");
+		restart		= new JMenuItem("Restart");
+		change		= new JMenuItem("Change size");
+		exit		= new JMenuItem("Exit");
 			
 		frame.setJMenuBar(myMenuBar);
 		myMenuBar.add(optionMenu);
 		optionMenu.add(load);
 		optionMenu.add(save);
 		optionMenu.add(restart);
+		optionMenu.add(change);
 		optionMenu.add(exit);
 		
+		change.addActionListener(aa);
 		restart.addActionListener(aa);
 		exit.addActionListener(aa);	
 		load.addActionListener(aa);
@@ -137,14 +188,30 @@ public class Controller implements MouseInputListener, KeyListener {
 	
 	class ActionAdapter implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			if(e.getSource().equals("exit"))
+			if(e.getSource().equals(exit))
 				System.exit(0);
-			if(e.getSource().equals("restart"))
+			if(e.getSource().equals(restart))
 				restart();
-			if(e.getSource().equals("save"))
+			if(e.getSource().equals(save))
 				save();
-			if(e.getSource().equals("load"))
+			if(e.getSource().equals(load))
 				load();
+			if(e.getSource().equals(change)){
+				int size = 0;
+				String sizetext = JOptionPane.showInputDialog("How big would you like the field to be? \nMaximum of 10 and minumum of 2", this);
+				try{
+					size = Integer.parseInt(sizetext);
+				} catch(NumberFormatException ne){
+					System.err.print("Errored on parsing interger for field");
+					ne.printStackTrace();
+				}
+				if(size!=0 && size <= minimum && size >= maximum)
+					restart(size);
+				else{
+					JOptionPane.showMessageDialog(null, "You entered a invalid text, field was set to default of 4.", "Failed", JOptionPane.INFORMATION_MESSAGE);
+					restart();
+				}
+			}
 		}
 	}
 	
@@ -169,6 +236,5 @@ public class Controller implements MouseInputListener, KeyListener {
 	      } catch (LineUnavailableException e) {
 	         e.printStackTrace();
 	      }
-	   }
-	
+	 }
 }

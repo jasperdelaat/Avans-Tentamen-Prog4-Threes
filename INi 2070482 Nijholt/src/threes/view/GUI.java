@@ -10,9 +10,10 @@ import javax.swing.JPanel;
 @SuppressWarnings("serial")
 public class GUI extends JFrame{
 
-	public final int		SCALE	= 1;
-	public final int 		WIDTH 	= 700;
-	public final int 		HEIGHT 	= 1000;
+	private final int		SCALE	= 1;
+	private final int 		WIDTH 	= 700;
+	private final int 		HEIGHT 	= 1000;
+	private JPanel			screen = new JPanel();
 	
 	public GUI(String title){
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -23,6 +24,13 @@ public class GUI extends JFrame{
 		this.pack();
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
+		init();
+	}
+	
+	private void init(){
+		screen.add(new FieldView());
+		screen.add(new Statistics());
+		this.setContentPane(screen);
 	}
 	
 	public void setLoadingCursor(boolean loading){
