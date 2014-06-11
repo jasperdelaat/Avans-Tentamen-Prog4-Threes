@@ -35,8 +35,8 @@ import threes.view.GUI;
 public class Controller implements MouseInputListener, KeyListener {
 	
 	private GUI						frame;
-	private HashMap<Integer, Color>	tileColor;
-	private HashMap<Integer, Color>	textColor;
+	private HashMap<Integer, Color>	tileColor = new HashMap<Integer, Color>();
+	private HashMap<Integer, Color>	textColor = new HashMap<Integer, Color>();
 	private ActionAdapter 			aa = new ActionAdapter();
 	private Board					b;
 	private final int				maximum = 10, minimum = 2;
@@ -47,11 +47,14 @@ public class Controller implements MouseInputListener, KeyListener {
 									exit;
 	private JFileChooser 			myFileChooser = new JFileChooser();
 	
-	public Controller(GUI f) {
-		this.frame = f;
+	public Controller() {
+		this.b = new Board();
+		this.frame = new GUI("Threes", b.getSize());
 		this.frame.setLoadingCursor(true);
 		this.createMenu();
 		this.playSound("music.wav", true);
+		this.fillMaps();
+		this.frame.getField().setTiles(b.getTiles());
 		
 		// Load images
 		/*try {
@@ -73,7 +76,7 @@ public class Controller implements MouseInputListener, KeyListener {
 		this.textColor.put(1, Color.BLACK);
 		this.textColor.put(2, Color.BLACK);
 		this.textColor.put(3, Color.BLACK);
-		this.textColor.put(6, Color.BLACK);
+		this.textColor.put(6, Color.PINK);
 	}
 	
 	private void restart() {
@@ -186,15 +189,18 @@ public class Controller implements MouseInputListener, KeyListener {
 			if(e.getSource().equals(load))
 				load();
 			if(e.getSource().equals(change)){
+				
+				// TODO: Redo this
+				
 				int size = 0;
-				String sizetext = JOptionPane.showInputDialog("How big would you like the field to be? \nMaximum of 10 and minumum of 2", this);
+				String sizetext = JOptionPane.showInputDialog("How big would you like the field to be? \nMaximum of 10 and minumum of 2", "4");
 				try{
 					size = Integer.parseInt(sizetext);
 				} catch(NumberFormatException ne){
 					System.err.print("Errored on parsing interger for field");
 					ne.printStackTrace();
 				}
-				if(size!=0 && size <= minimum && size >= maximum)
+				if(size <= minimum && size >= maximum)
 					restart(size);
 				else{
 					JOptionPane.showMessageDialog(null, "You entered a invalid text, field was set to default of 4.", "Failed", JOptionPane.INFORMATION_MESSAGE);

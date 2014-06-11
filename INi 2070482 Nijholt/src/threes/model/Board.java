@@ -1,13 +1,15 @@
 package threes.model;
 
 import java.util.ArrayList;
+import java.util.Observable;
 import java.util.Random;
+
 import threes.model.Tile;
 
-public class Board {
+public class Board{
 
 	private int 			size;
-	private ArrayList<Tile> tiles;
+	private ArrayList<Tile> tiles = new ArrayList<Tile>();
 
 	public Board() {
 		this.setSize(4);
@@ -37,6 +39,10 @@ public class Board {
 	
 	public ArrayList<Tile> getTiles() {
 		return tiles;
+	}
+	
+	public void addTile(Tile t){
+		tiles.add(t);
 	}
 
 	public int getSize() {

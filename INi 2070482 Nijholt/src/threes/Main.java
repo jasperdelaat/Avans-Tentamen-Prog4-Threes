@@ -6,7 +6,7 @@ import threes.view.GUI;
 public class Main {
 
 	public static void main(String[] args) {
-		new Controller(new GUI("Threes"));
+		new Controller();
 	}
 
 }
